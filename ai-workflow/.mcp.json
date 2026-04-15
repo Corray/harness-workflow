@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "figma": {
+      "command": "npx",
+      "args": ["-y", "figma-developer-mcp", "--stdio"],
+      "env": {
+        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
+      }
+    },
+    "lanhu": {
+      "command": "npx",
+      "args": ["-y", "@lanhu/mcp-server"],
+      "env": {
+        "LANHU_TOKEN": "${LANHU_TOKEN}"
+      }
+    },
+    "tapd": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["mcp-server-tapd"],
+      "env": {
+        "BOT_URL": "",
+        "TAPD_ACCESS_TOKEN": "${TAPD_ACCESS_TOKEN}",
+        "TAPD_API_BASE_URL": "https://api.tapd.cn",
+        "TAPD_API_PASSWORD": "",
+        "TAPD_API_USER": "",
+        "TAPD_BASE_URL": "https://www.tapd.cn"
+      }
+    }
+  }
+}

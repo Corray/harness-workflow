@@ -1,0 +1,14 @@
+name: example-project
+description: 示例项目
+stack:
+  backend: java-spring-boot
+  frontend: react
+owners:
+  product: "@alice"
+  backend: "@bob"
+  frontend: "@charlie"
+  qa: "@diana"
+linked_repos:
+  - git@github.com:your-org/example-project-api.git
+  - git@github.com:your-org/example-project-web.git
+current_version: v1.0
