@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# macOS
+.DS_Store
+
+# Claude Code local (user-specific, auto-generated)
+.claude/settings.local.json
+
+# Dashboard local outputs (generated preview)
+dashboard-preview.html
+dashboard/*.html
+dashboard/__pycache__/
+
+# Temporary worktrees created by /run-tasks --parallel N
+.worktrees/
+
+# Backup files from upgrade.sh
+*.bak
+*.new

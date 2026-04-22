@@ -31,6 +31,14 @@ knowledge/frontend/common-pitfalls.md
 knowledge/red-lines.md
 ```
 
+### 记录 knowledge-hits 事件
+
+**每加载一个 knowledge 文件追加一条**到 `docs/workspace/.harness-metrics/knowledge-hits/{YYYY-MM}.jsonl`（供 `/metrics` 统计 Top / 零命中）：
+
+```jsonl
+{"time":"2026-04-22T15:30:00Z","command":"/impl","file":"backend/api-conventions.md","bytes_loaded":2450}
+```
+
 ### 加载设计文档
 `docs/design/{feature}-{role}.md`
 
@@ -142,7 +150,27 @@ knowledge/red-lines.md
 
 1. 读取 `docs/tasks/{sprint}/checklist.md`
 2. 勾选已完成任务
-3. 显示剩余任务
+3. 如 `tasks.yaml` 存在且本次对应某个 task id → 把该 task 的 `status` 字段标为 `done`
+4. 显示剩余任务
+
+## Step I：回写 metrics 事件（不可跳过）
+
+追加一条 impl 事件到 `docs/workspace/.harness-metrics/impl/{YYYY-MM}.jsonl`（按月滚动），供 `/metrics` 聚合：
+
+```jsonl
+{"time":"2026-04-22T15:30:00Z","developer":"{dev}","task_desc":"{feature 简述}","task_size":"small","role":"{backend|frontend}","files_changed":3,"tests_added":2,"heal_cycles":1,"first_pass":false,"human_intervention":false,"intervention_reason":null,"commit_hash":"{short-hash}","duration_minutes":12,"knowledge_loaded":["backend/api-conventions.md","red-lines.md"],"knowledge_updated":["backend/framework-specifics.md"],"red_lines_triggered":[]}
+```
+
+字段说明：
+- `heal_cycles`：Step E 自检+自修的轮次
+- `first_pass`：`heal_cycles == 0 && 无人工介入`
+- `human_intervention`：Step D/E 是否因设计缺口或失败暂停过
+- `intervention_reason`：暂停原因，取 `3_rounds_failed` / `env_issue` / `manual_op` / `spec_issue` / `large_task`；否则 `null`
+- `knowledge_loaded`：Step A 实际读取的 knowledge 文件
+- `knowledge_updated`：Step G 本次追加/修改的 knowledge
+- `red_lines_triggered`：Step E 红线扫描命中并自修的条目
+
+**硬约束**：即使本次因失败或人工介入提前终止，也必须写一条 impl 事件（`human_intervention: true`，字段据实填写）。`/metrics` 的"人工介入率"、"自愈 3 轮失败率"靠这部分数据。
 
 ## 反馈循环：Spec 反推
 

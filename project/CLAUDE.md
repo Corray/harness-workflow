@@ -10,8 +10,13 @@
 - **共识源在 consensus-hub**：本仓库 `docs/consensus/` 只是**只读镜像**，真相源是 hub 仓库
 - **分层知识按需加载**：只加载当前角色相关的 knowledge 文件，避免上下文污染
 - **Journal 驱动连续性**：每次 session 开始读 journal，结束写 journal
-- **自检先于人检**：代码生成后先自检，再交给人工 review
+- **完成标准是合约**：`tasks.yaml` 的 `verify` 断言全绿才算做完（防止 AI *premature closure*）
+- **自检先于人检**：代码生成后先 Generator 自审（/review）
+- **独立 Evaluator 对抗自迭代**：PR/Sprint 合并前必须新开 session 跑 `/adversarial-review`，不让同一 agent 既写又审；关键路径走 `--oracle`（两个差异化 Evaluator strict-AND）
+- **并行不破坏依赖**：`/run-tasks --parallel N` 按 `depends_on` 分波，同波任务在各自 git worktree 里跑；合并严格 ff-only 拓扑序，冲突走自愈循环而不是 `--no-ff` 掩盖
+- **红线直接 Reject**：红线违反和断言失败都不进入扣分讨论
 - **知识沉淀**：发现未记录的模式或踩坑点，主动建议更新 knowledge
+- **用数字指导 harness 优化**：定期跑 `/metrics`，凭数据调整 knowledge 和红线
 
 ## 共识文档读取优先级
 
@@ -57,8 +62,17 @@ project/
     ├── baseline/
     ├── consensus/                          # consensus-hub 的只读镜像（由 /sync-consensus 维护）
     ├── design/
-    ├── workspace/{developer}/journal.md
-    ├── tasks/{sprint}/checklist.md
+    ├── workspace/
+    │   ├── {developer}/journal.md          # 跨 session 工作记忆
+    │   └── .harness-metrics/               # 结构化事件流（/metrics 数据源）
+    │       ├── impl/*.jsonl
+    │       ├── adversarial/*.jsonl
+    │       ├── run-tasks/*.jsonl
+    │       └── knowledge-hits/*.jsonl
+    ├── tasks/{sprint}/
+    │   ├── checklist.md                    # 人类视角
+    │   ├── tasks.yaml                      # 机器视角（verify 断言 /run-tasks 执行）
+    │   └── fix-tasks.yaml                  # /adversarial-review Must-Fix 时自动生成（可选）
     └── feedback/
 ```
 
@@ -67,14 +81,21 @@ project/
 | 命令 | 说明 |
 |------|------|
 | /init-baseline | 首次接入，扫描代码库，初始化知识层 |
-| /iterate | 迭代影响分析 + 任务清单生成 |
+| /iterate | 迭代影响分析 + 任务清单生成（含机器可执行的 `tasks.yaml`） |
 | /design | 按角色生成详细设计 |
 | /impl | 8 步编码实现（含 journal） |
-| /review | 结构化代码校验 |
+| /run-tasks | 批量循环执行 `tasks.yaml` 的验证断言，每任务一 commit，统一 review + 集成 + PR；支持 **`--parallel N`** 并行 Worker（git worktree 隔离，按 `depends_on` 分波，ff-only 拓扑序合并） |
+| /review | 结构化代码校验（Generator 自审） |
+| **/adversarial-review** | **独立 Evaluator 对抗式评估**（必须新开 session）；关键路径用 **`--oracle`** 双 Evaluator strict-AND（A 严格规范型 + B 对抗反例型，两者都 Approve 才过） |
 | /test-gen | 测试用例生成 |
 | /preflight | 提交前全面检查 |
+| **/metrics** | **Harness 运行指标聚合**（首次通过率、Evaluator 分数、knowledge 命中） |
+| **/dashboard** | **跨项目看板**（全局命令，单页 HTML 汇总所有注册项目的指标 + 对抗评估 + 时间线） |
 | /record-session | 会话结束记录 |
 | /spec-feedback | 设计缺口反馈 |
+| **/command-feedback** | **记录对 slash 命令本身的修改建议**（支持 `--collect` 聚合跨项目反馈，用于回 PR 模板仓库） |
+
+**设计哲学见 [HARNESS_PHILOSOPHY.md](./HARNESS_PHILOSOPHY.md)**（安装后在项目根目录）——说明三条核心信念、为什么要有独立 Evaluator、为什么 tasks.yaml 和 checklist.md 分成两份。
 
 ## 上下文加载策略
 
@@ -82,20 +103,28 @@ project/
 
 **后端**执行 /impl 或 /review：
 ```
-加载：CLAUDE.md → knowledge/backend/* → knowledge/red-lines.md → docs/design/{feature}.md
+加载：CLAUDE.md → knowledge/backend/* → knowledge/collaboration.md → knowledge/red-lines.md → docs/design/{feature}.md
 跳过：knowledge/frontend/*、knowledge/testing/*
 ```
 
 **前端**执行 /impl 或 /review：
 ```
-加载：CLAUDE.md → knowledge/frontend/* → knowledge/red-lines.md → docs/design/{feature}.md
+加载：CLAUDE.md → knowledge/frontend/* → knowledge/collaboration.md → knowledge/red-lines.md → docs/design/{feature}.md
 跳过：knowledge/backend/*、knowledge/testing/*
 ```
 
 **测试**执行 /test-gen：
 ```
-加载：CLAUDE.md → knowledge/testing/* → knowledge/red-lines.md → docs/consensus/ → 实际代码
+加载：CLAUDE.md → knowledge/testing/* → knowledge/collaboration.md → knowledge/red-lines.md → docs/consensus/ → 实际代码
 ```
+
+**`/run-tasks` 和 `/preflight`**（任意角色）：
+```
+加载：CLAUDE.md → knowledge/collaboration.md → knowledge/red-lines.md
+（启动前自检 + 多 agent 冲突识别依据；`/run-tasks --parallel N` 的 Worker 在自己的 worktree 里各自加载）
+```
+
+**为什么 `collaboration.md` 要额外加载？** 它专门覆盖"多 agent / 多窗口并发共用工作区"场景下的识别信号、启动前自检、事故处置规范。所有直接操作工作区的命令（/impl / /review / /run-tasks / /preflight）都需要这份知识，`/adversarial-review` 和 `/design` 不直接动工作区所以不加载。
 
 ### Journal 加载
 
@@ -149,7 +178,22 @@ project/
 
 ## 反馈循环
 
-发现设计或共识文档有问题时：
+**设计/共识文档问题**：
 1. 使用 /spec-feedback 生成结构化反馈
 2. 保存到 `docs/feedback/`
 3. 团队决定：更新设计 or 升级到共识文档更新
+
+**命令本身（.claude/commands/*.md）的问题**：
+1. 使用 /command-feedback &lt;命令名&gt; "&lt;问题描述&gt;" 生成结构化反馈
+2. 保存到 `docs/feedback/commands/`，同时写一条事件流进 `/dashboard`
+3. 在 harness-workflow 模板仓库跑 `/command-feedback --collect` 聚合跨项目的反馈，一次性 PR 回模板
+
+## 升级 harness 本身
+
+harness-workflow 模板更新时：
+
+- 单项目：`cd 项目目录 && bash /path/to/harness-workflow/upgrade.sh`
+- 所有注册项目一次性升级：`cd /path/to/harness-workflow && bash upgrade-all.sh`
+  - `--dry-run` 先预览
+  - `--safe` 改过的命令只生成 .new 旁注
+  - `--only NAME` 只升级指定项目

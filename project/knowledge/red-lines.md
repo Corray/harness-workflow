@@ -29,3 +29,11 @@
 ## Journal 红线
 17. /impl 必须写 journal（Step F 不可跳过）
 18. 发现的问题必须记录，即使当下没解决
+
+## 多 Agent 协作红线
+
+> 详细规范见 `knowledge/collaboration.md`。以下为**硬约束**，触发即 Reject。
+
+19. **禁止用破坏性命令清理陌生 WIP** — 碰到陌生的未提交改动 / 陌生 stash / 来源不明的 reflog，**禁止** `git checkout .` / `git clean -fd` / `git reset --hard` / `rm -rf .git`；必须用 `git stash push -m "others-wip-possibly-from-agent-X"` 带标识暂存再排查。破坏性操作会直接毁掉对方 agent 的数小时工作。
+20. **改完立即 commit（小原子单位）** — 不追求"先跑完全套测试再 commit"。缩短未 commit 窗口是多 agent 协作下最有效的污染防护；commit 本身即 checkpoint，测试失败用 `git reset --soft HEAD^` 比"从未 commit 状态恢复"安全得多。
+21. **启动前必须跑并发冲突自检** — 新 session / `/impl` 侦察 / `/run-tasks` Step B 必须跑 `git status --porcelain` + `git stash list` + `git reflog -n 10`。任一命中异常必须暂停问人，不得自作主张处理。

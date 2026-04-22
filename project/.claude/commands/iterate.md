@@ -41,23 +41,26 @@
 
 保存到 `docs/design/iterate-{sprint}-{date}.md`
 
-### 5. 自动生成任务清单
+### 5. 自动生成任务清单（双视角）
 
-从共识文档提取可执行任务，按角色分组：
+从共识文档提取可执行任务，**同时生成两份文件**：
+
+#### 5.1 `checklist.md`（人类阅读视角）
 
 ```markdown
 ## Sprint {name} 任务清单
+配套机器文件：./tasks.yaml（由 /run-tasks 解析执行）
 
 ### 后端任务
-- [ ] T001 {具体任务}（预计工作量）
-- [ ] T002 {具体任务}
+- [ ] T001 {任务描述}（预计工作量）
+  - 验证摘要：{一句话口径，详见 tasks.yaml#T001}
+- [ ] T002 {任务描述}
 
 ### 前端任务
-- [ ] T101 {具体任务}
-- [ ] T102 {具体任务}
+- [ ] T101 {任务描述}
 
 ### 测试任务
-- [ ] T201 {具体任务}
+- [ ] T201 {任务描述}
 
 ### 产品确认
 - [ ] Q1 {待确认问题}
@@ -65,6 +68,55 @@
 ```
 
 保存到 `docs/tasks/{sprint}/checklist.md`
+
+#### 5.2 `tasks.yaml`（机器执行视角，核心）
+
+每个任务必须附带**可机械执行的验证断言**。断言由 `/run-tasks` 在验证循环中实际执行：
+
+```yaml
+sprint: "{sprint-name}"
+generated_at: "{YYYY-MM-DD}"
+baseline_commit: "{commit-hash}"
+
+tasks:
+  - id: T001
+    role: backend
+    desc: "新增订单状态字段"
+    depends_on: []
+    verify:
+      - kind: cmd
+        run: "mvn test -Dtest=OrderServiceTest"
+        expect_exit: 0
+      - kind: file_contains
+        path: "order-domain/.../Order.java"
+        text: "private OrderStatus status"
+      - kind: http
+        method: GET
+        url: "http://localhost:8080/api/v1/orders/1"
+        expect_status: 200
+        expect_jsonpath:
+          "$.status": "*"
+      - kind: regression
+        scope: "order-module"
+        expect: all_pass
+
+product_confirmations:
+  - id: Q1
+    question: "..."
+    blocks: [T101]
+```
+
+保存到 `docs/tasks/{sprint}/tasks.yaml`
+
+**断言种类**：`cmd` / `file_contains` / `file_matches` / `http` / `sql` / `e2e` / `regression`
+
+**硬约束**：
+- 每个任务至少 2 条断言（构建类 + 功能类）
+- 涉及接口的任务必须有 `http` 或 `e2e` 断言
+- 涉及数据库变更的任务必须有 `sql` 断言
+- 必须包含一条 `regression` 断言
+- 前端任务必须至少一条 `e2e` 断言（需 Playwright MCP）
+- 禁止 `kind: manual` —— 无法机械验证的任务应拆分或移出 checklist
 
 ### 6. 人工确认
 
