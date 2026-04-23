@@ -10,7 +10,7 @@
 - **共识源在 consensus-hub**：本仓库 `docs/consensus/` 只是**只读镜像**，真相源是 hub 仓库
 - **分层知识按需加载**：只加载当前角色相关的 knowledge 文件，避免上下文污染
 - **Journal 驱动连续性**：每次 session 开始读 journal，结束写 journal
-- **完成标准是合约**：`tasks.yaml` 的 `verify` 断言全绿才算做完（防止 AI *premature closure*）
+- **完成标准是合约**：`tasks.yaml` 的 `verify` 断言全绿才算做完（防止 AI *premature closure*）。大任务 `docs/tasks/{sprint}/tasks.yaml` 由 `/iterate` 产出；不走 /iterate 的 /impl 在完成时自动写 `docs/tasks/ad-hoc/{YYYY-MM-DD}-{slug}/tasks.yaml`，两条路径都必须有客观判据，否则 `/adversarial-review` 的 Step 3 断言执行会塌
 - **自检先于人检**：代码生成后先 Generator 自审（/review）
 - **独立 Evaluator 对抗自迭代**：PR/Sprint 合并前必须新开 session 跑 `/adversarial-review`，不让同一 agent 既写又审；关键路径走 `--oracle`（两个差异化 Evaluator strict-AND）
 - **并行不破坏依赖**：`/run-tasks --parallel N` 按 `depends_on` 分波，同波任务在各自 git worktree 里跑；合并严格 ff-only 拓扑序，冲突走自愈循环而不是 `--no-ff` 掩盖
@@ -69,10 +69,14 @@ project/
     │       ├── adversarial/*.jsonl
     │       ├── run-tasks/*.jsonl
     │       └── knowledge-hits/*.jsonl
-    ├── tasks/{sprint}/
-    │   ├── checklist.md                    # 人类视角
-    │   ├── tasks.yaml                      # 机器视角（verify 断言 /run-tasks 执行）
-    │   └── fix-tasks.yaml                  # /adversarial-review Must-Fix 时自动生成（可选）
+    ├── tasks/
+    │   ├── {sprint}/                       # 大任务：/iterate 产出
+    │   │   ├── checklist.md                # 人类视角
+    │   │   ├── tasks.yaml                  # 机器视角（verify 断言 /run-tasks 执行）
+    │   │   └── fix-tasks.yaml              # /adversarial-review Must-Fix 时自动生成（可选）
+    │   └── ad-hoc/                         # 小任务：/impl 直走时自动生成
+    │       └── {YYYY-MM-DD}-{slug}/
+    │           └── tasks.yaml              # 供 /adversarial-review 做客观判据
     └── feedback/
 ```
 

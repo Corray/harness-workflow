@@ -153,12 +153,67 @@ knowledge/red-lines.md
 3. 如 `tasks.yaml` 存在且本次对应某个 task id → 把该 task 的 `status` 字段标为 `done`
 4. 显示剩余任务
 
-## Step I：回写 metrics 事件（不可跳过）
+## Step I：补写 ad-hoc tasks.yaml（不可跳过）
+
+**触发条件**：当前 feature 对应的 `docs/tasks/{sprint}/tasks.yaml` **不存在**时触发；存在时跳过本步。
+
+**目的**：为后续 `/adversarial-review` 提供客观判据。`/adversarial-review` 的 Step 3 "机械执行 tasks.yaml 的 verify 断言" 是防 *premature closure* 的强约束，没有 tasks.yaml 这一步就失效。/iterate 绕过时不能豁免客观判据。
+
+**写入位置**：`docs/tasks/ad-hoc/{YYYY-MM-DD}-{slug}/tasks.yaml`
+
+- `{slug}` 规则：feature 名称转小写短横线，截 40 字符；拿不到就用 `IMPL-{HHmmss}`
+- 同一天同一 slug 已存在时，追加 `-2` / `-3` 后缀
+
+**内容模板**：
+
+```yaml
+# 由 /impl 自动生成（ad-hoc 路径）
+# 目的：为 /adversarial-review 提供 verify 断言
+sprint: ad-hoc
+source: /impl
+generated_at: 2026-04-22T15:30:00Z
+role: backend          # backend | frontend
+branch: {当前分支名}
+commit: {short-hash}
+
+tasks:
+  - id: IMPL-{YYYYMMDD-HHmmss}
+    desc: "{feature 简述}"
+    status: done
+    files_changed:
+      - {file 1 from git diff --name-only HEAD~1..HEAD}
+      - {file 2}
+    verify:
+      # 必填：Step E 已跑过且通过的测试命令
+      - type: cmd
+        cmd: "{例如 mvn test -Dtest=XxxTest}"
+      # 必填：本次新增/关键修改的代码标识
+      - type: file_contains
+        file: "{主要改动文件路径}"
+        pattern: "{关键标识：新方法签名 / 新字段 / 新路由}"
+```
+
+**填写规则**：
+- `verify.cmd` **必须**是 Step E 已经绿过的命令，不要写"未来应该跑"的占位符
+- `verify.file_contains.pattern` 要选**本次新增或关键修改**的标识，不要选原来就有的行
+- 至少 1 条 `cmd` + 1 条 `file_contains`
+- 宁可少一条也不许假数据
+
+**后续提示**：
+
+```
+🧪 本次若需对抗评估，执行：
+  【新开 session】/adversarial-review --sprint ad-hoc/{YYYY-MM-DD}-{slug}
+                  或
+  【新开 session】/adversarial-review --branch {当前分支}
+```
+
+## Step J：回写 metrics 事件（不可跳过）
 
 追加一条 impl 事件到 `docs/workspace/.harness-metrics/impl/{YYYY-MM}.jsonl`（按月滚动），供 `/metrics` 聚合：
 
 ```jsonl
-{"time":"2026-04-22T15:30:00Z","developer":"{dev}","task_desc":"{feature 简述}","task_size":"small","role":"{backend|frontend}","files_changed":3,"tests_added":2,"heal_cycles":1,"first_pass":false,"human_intervention":false,"intervention_reason":null,"commit_hash":"{short-hash}","duration_minutes":12,"knowledge_loaded":["backend/api-conventions.md","red-lines.md"],"knowledge_updated":["backend/framework-specifics.md"],"red_lines_triggered":[]}
+{"time":"2026-04-22T15:30:00Z","developer":"{dev}","task_desc":"{feature 简述}","task_size":"small","role":"{backend|frontend}","files_changed":3,"tests_added":2,"heal_cycles":1,"first_pass":false,"human_intervention":false,"intervention_reason":null,"commit_hash":"{short-hash}","duration_minutes":12,"knowledge_loaded":["backend/api-conventions.md","red-lines.md"],"knowledge_updated":["backend/framework-specifics.md"],"red_lines_triggered":[],"tasks_yaml_path":"docs/tasks/ad-hoc/2026-04-22-fix-pagination/tasks.yaml"}
 ```
 
 字段说明：
@@ -169,6 +224,7 @@ knowledge/red-lines.md
 - `knowledge_loaded`：Step A 实际读取的 knowledge 文件
 - `knowledge_updated`：Step G 本次追加/修改的 knowledge
 - `red_lines_triggered`：Step E 红线扫描命中并自修的条目
+- `tasks_yaml_path`：sprint 已有 tasks.yaml 时指向该路径；否则指向 Step I 刚写的 ad-hoc tasks.yaml 路径。**必填**，`/adversarial-review` 和 `/dashboard` 靠该字段定位断言源。
 
 **硬约束**：即使本次因失败或人工介入提前终止，也必须写一条 impl 事件（`human_intervention: true`，字段据实填写）。`/metrics` 的"人工介入率"、"自愈 3 轮失败率"靠这部分数据。
 
