@@ -72,7 +72,7 @@ const i18n = {
             { tags: ["human"], title: "Confirm iterate consensus + task list", desc: "Review accuracy of impact analysis and task breakdown\nSync with PM for product confirmation items", dot: "red" },
           ]},
           { name: "/design — layered knowledge per role", steps: [
-            { tags: ["ctx"], title: "Load consensus + role-specific knowledge only", desc: "Backend → knowledge/backend/* + red-lines.md (skip frontend/)\nFrontend → knowledge/frontend/* + red-lines.md (skip backend/)\nMinimum context, maximum relevance", dot: "purple" },
+            { tags: ["ctx"], title: "Load consensus + role-specific knowledge only", desc: "Backend → .claude/knowledge/backend/* + red-lines.md (skip frontend/)\nFrontend → .claude/knowledge/frontend/* + red-lines.md (skip backend/)\nMinimum context, maximum relevance", dot: "purple" },
             { tags: ["tool"], title: "Generate detailed design (iteration-aware)", desc: "For iterations: only cover changed parts, mark new vs modified\nFor 0-1 projects: full design as before", dot: "emerald" },
             { tags: ["verify"], title: "Auto-check design vs consensus contracts", desc: "Conflicts → prompt to update iterate consensus first", dot: "amber" },
             { tags: ["human"], title: "Design review — confirm alignment", desc: "Review design, confirm it aligns with consensus", dot: "red" },
@@ -111,7 +111,7 @@ const i18n = {
         summary: "Test plan + code → /test-gen (layered knowledge) → /preflight (compile+test+scan) → PR approve → merge.",
         flows: [
           { name: "/test-gen & /preflight", steps: [
-            { tags: ["ctx"], title: "Load test plan + knowledge/testing/ + consensus flows", desc: "Layered: only testing/standards.md + red-lines.md\n+ Mermaid business flows from consensus + actual code", dot: "purple" },
+            { tags: ["ctx"], title: "Load test plan + .claude/knowledge/testing/ + consensus flows", desc: "Layered: only testing/standards.md + red-lines.md\n+ Mermaid business flows from consensus + actual code", dot: "purple" },
             { tags: ["tool"], title: "/test-gen {feature}", desc: "Unit tests (JUnit 5 / React Testing Library) + API integration tests\nEvery flow path (normal + exception) → test case\nAligned with design contracts", dot: "emerald" },
             { tags: ["verify"], title: "/preflight — pre-commit check", desc: "Compile → run tests → coverage → red line scan → design alignment\nAll pass → ready. Fail → specific fix guidance", dot: "amber" },
             { tags: ["human"], title: "Approve PR → merge", desc: "Final human gate before code enters main branch", dot: "red" },
@@ -206,7 +206,7 @@ const i18n = {
             { tags: ["human"], title: "确认迭代共识 + 任务清单", desc: "检查影响分析准确性和任务拆分粒度\n同步 PM 确认产品确认项", dot: "red" },
           ]},
           { name: "/design — 分层 Knowledge 按角色加载", steps: [
-            { tags: ["ctx"], title: "只加载角色相关的 Knowledge", desc: "后端 → knowledge/backend/* + red-lines.md（跳过 frontend/）\n前端 → knowledge/frontend/* + red-lines.md（跳过 backend/）\n最小上下文，最大相关性", dot: "purple" },
+            { tags: ["ctx"], title: "只加载角色相关的 Knowledge", desc: "后端 → .claude/knowledge/backend/* + red-lines.md（跳过 frontend/）\n前端 → .claude/knowledge/frontend/* + red-lines.md（跳过 backend/）\n最小上下文，最大相关性", dot: "purple" },
             { tags: ["tool"], title: "生成详细设计（迭代感知）", desc: "迭代场景：只覆盖变更部分，标注新增 vs 修改\n0-1 项目：完整设计", dot: "emerald" },
             { tags: ["verify"], title: "自动校验与共识文档一致性", desc: "发现冲突 → 提示先更新迭代共识", dot: "amber" },
             { tags: ["human"], title: "设计评审 — 确认对齐", desc: "审查设计，确认与共识文档一致", dot: "red" },

@@ -29,35 +29,37 @@
 ## 项目结构
 
 ```
-project/
+your-project/
 ├── CLAUDE.md                              # 本文件
+├── HARNESS_PHILOSOPHY.md                  # 设计哲学（建议通读）
 ├── project.yaml                           # 项目元数据
 ├── .claude/
-│   └── commands/
-│       ├── init-baseline.md               # /init-baseline
-│       ├── iterate.md                     # /iterate
-│       ├── design.md                      # /design
-│       ├── impl.md                        # /impl
-│       ├── review.md                      # /review
-│       ├── test-gen.md                    # /test-gen
-│       ├── preflight.md                   # /preflight
-│       ├── record-session.md              # /record-session
-│       └── spec-feedback.md               # /spec-feedback
-├── knowledge/
-│   ├── backend/
-│   │   ├── architecture.md
-│   │   ├── api-conventions.md
-│   │   ├── database-patterns.md
-│   │   ├── framework-specifics.md
-│   │   └── common-pitfalls.md
-│   ├── frontend/
-│   │   ├── architecture.md
-│   │   ├── component-library.md
-│   │   ├── api-integration.md
-│   │   └── common-pitfalls.md
-│   ├── testing/
-│   │   └── standards.md
-│   └── red-lines.md
+│   ├── commands/
+│   │   ├── init-baseline.md               # /init-baseline
+│   │   ├── iterate.md                     # /iterate
+│   │   ├── design.md                      # /design
+│   │   ├── impl.md                        # /impl
+│   │   ├── run-tasks.md                   # /run-tasks
+│   │   ├── review.md                      # /review
+│   │   ├── adversarial-review.md          # /adversarial-review
+│   │   ├── test-gen.md                    # /test-gen
+│   │   ├── preflight.md                   # /preflight
+│   │   ├── metrics.md                     # /metrics
+│   │   ├── record-session.md              # /record-session
+│   │   ├── spec-feedback.md               # /spec-feedback
+│   │   └── command-feedback.md            # /command-feedback
+│   └── knowledge/
+│       ├── backend/
+│       │   ├── architecture.md
+│       │   ├── api-conventions.md
+│       │   └── sxp-framework.md
+│       ├── frontend/
+│       │   ├── react-patterns.md
+│       │   └── taro-patterns.md
+│       ├── testing/
+│       │   └── standards.md
+│       ├── collaboration.md
+│       └── red-lines.md
 └── docs/
     ├── baseline/
     ├── consensus/                          # consensus-hub 的只读镜像（由 /sync-consensus 维护）
@@ -107,24 +109,24 @@ project/
 
 **后端**执行 /impl 或 /review：
 ```
-加载：CLAUDE.md → knowledge/backend/* → knowledge/collaboration.md → knowledge/red-lines.md → docs/design/{feature}.md
-跳过：knowledge/frontend/*、knowledge/testing/*
+加载：CLAUDE.md → .claude/knowledge/backend/* → .claude/knowledge/collaboration.md → .claude/knowledge/red-lines.md → docs/design/{feature}.md
+跳过：.claude/knowledge/frontend/*、.claude/knowledge/testing/*
 ```
 
 **前端**执行 /impl 或 /review：
 ```
-加载：CLAUDE.md → knowledge/frontend/* → knowledge/collaboration.md → knowledge/red-lines.md → docs/design/{feature}.md
-跳过：knowledge/backend/*、knowledge/testing/*
+加载：CLAUDE.md → .claude/knowledge/frontend/* → .claude/knowledge/collaboration.md → .claude/knowledge/red-lines.md → docs/design/{feature}.md
+跳过：.claude/knowledge/backend/*、.claude/knowledge/testing/*
 ```
 
 **测试**执行 /test-gen：
 ```
-加载：CLAUDE.md → knowledge/testing/* → knowledge/collaboration.md → knowledge/red-lines.md → docs/consensus/ → 实际代码
+加载：CLAUDE.md → .claude/knowledge/testing/* → .claude/knowledge/collaboration.md → .claude/knowledge/red-lines.md → docs/consensus/ → 实际代码
 ```
 
 **`/run-tasks` 和 `/preflight`**（任意角色）：
 ```
-加载：CLAUDE.md → knowledge/collaboration.md → knowledge/red-lines.md
+加载：CLAUDE.md → .claude/knowledge/collaboration.md → .claude/knowledge/red-lines.md
 （启动前自检 + 多 agent 冲突识别依据；`/run-tasks --parallel N` 的 Worker 在自己的 worktree 里各自加载）
 ```
 

@@ -12,8 +12,8 @@
 ### 2. 初始化分层 knowledge
 
 基于检测到的技术栈自动填充：
-- Java 后端 → 填充 `knowledge/backend/` 下的模板
-- React/Vue 前端 → 填充 `knowledge/frontend/` 下的模板
+- Java 后端 → 填充 `.claude/knowledge/backend/` 下的模板
+- React/Vue 前端 → 填充 `.claude/knowledge/frontend/` 下的模板
 - 删除不适用的模板，只保留匹配的
 
 ### 3. 保存基线
@@ -47,7 +47,7 @@ consensus:
 
 提示：
 > 基线已生成，请检查：
-> - knowledge/ 下的模板是否需要补充项目特定的约定
+> - .claude/knowledge/ 下的模板是否需要补充项目特定的约定
 > - docs/baseline/ 中的内容是否准确
 > - project.yaml 的信息是否完整
 >

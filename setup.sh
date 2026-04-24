@@ -7,8 +7,8 @@
 #   3. 按提示输入参数
 #
 # 安装内容：
-# - 在当前项目下创建 .claude/commands/（13 个命令，含 /command-feedback）、knowledge/ 和 docs/ 结构
-# - 项目根目录放置 HARNESS_PHILOSOPHY.md（设计哲学参考）
+# - 在当前项目下创建 .claude/commands/（13 个命令，含 /command-feedback）、.claude/knowledge/ 和 docs/ 结构
+# - 项目根目录放置 CLAUDE.md 和 HARNESS_PHILOSOPHY.md（设计哲学参考）
 # - 在 docs/workspace/ 下初始化 .harness-metrics/ 事件流目录（/metrics 数据源）
 # - 在 ~/.claude/commands/ 安装全局命令（sync-consensus, list-projects, dashboard）
 # - 在 ~/.claude/harness-dashboard/ 安装 /dashboard 聚合脚本（跨项目共享）
@@ -80,7 +80,7 @@ echo ""
 echo -e "${GREEN}[3/6] 安装项目级配置到 ${CURRENT_DIR}${NC}"
 
 mkdir -p .claude/commands
-mkdir -p knowledge/backend knowledge/frontend knowledge/testing
+mkdir -p .claude/knowledge/backend .claude/knowledge/frontend .claude/knowledge/testing
 mkdir -p docs/baseline docs/consensus docs/design docs/workspace docs/tasks docs/feedback
 
 # 创建 /metrics 事件流目录骨架（/impl、/run-tasks、/adversarial-review 会往这里写 jsonl）
@@ -92,17 +92,18 @@ mkdir -p docs/feedback/commands
 touch docs/feedback/commands/.gitkeep
 
 # 复制项目模板
-cp "$TEMPLATES_DIR/project/CLAUDE.md" ./CLAUDE.md
+cp "$TEMPLATES_DIR/CLAUDE.md" ./CLAUDE.md
 cp "$TEMPLATES_DIR/HARNESS_PHILOSOPHY.md" ./HARNESS_PHILOSOPHY.md
-cp -r "$TEMPLATES_DIR/project/.claude/commands/." ./.claude/commands/
-cp "$TEMPLATES_DIR/project/knowledge/red-lines.md" ./knowledge/red-lines.md
-cp "$TEMPLATES_DIR/project/.mcp.json" ./.mcp.json 2>/dev/null || true
+cp -r "$TEMPLATES_DIR/.claude/commands/." ./.claude/commands/
+# 复制 knowledge（backend / frontend / testing 的种子文件 + collaboration.md + red-lines.md）
+cp -r "$TEMPLATES_DIR/.claude/knowledge/." ./.claude/knowledge/
+cp "$TEMPLATES_DIR/.mcp.json" ./.mcp.json 2>/dev/null || true
 
-COMMAND_COUNT=$(find "$TEMPLATES_DIR/project/.claude/commands" -maxdepth 1 -name "*.md" | wc -l | tr -d ' ')
+COMMAND_COUNT=$(find "$TEMPLATES_DIR/.claude/commands" -maxdepth 1 -name "*.md" | wc -l | tr -d ' ')
 echo "  - CLAUDE.md 已就位"
 echo "  - HARNESS_PHILOSOPHY.md 已就位（设计哲学，建议通读）"
 echo "  - ${COMMAND_COUNT} 个命令文件已就位（含 /adversarial-review、/metrics、/run-tasks、/command-feedback）"
-echo "  - knowledge/red-lines.md 已就位"
+echo "  - .claude/knowledge/（backend / frontend / testing / collaboration.md / red-lines.md）已就位"
 echo "  - docs/workspace/.harness-metrics/ 事件流目录骨架已就位（/metrics 数据源）"
 echo "  - .mcp.json 已就位（如存在）"
 echo ""
@@ -226,7 +227,7 @@ if [ -z "$CONSENSUS_HUB_REPO" ]; then
   echo ""
   echo -e "${YELLOW}提示：你没有填写 consensus-hub 地址。${NC}"
   echo "  请在 GitHub 新建一个 private 仓库，例如 your-org/consensus-hub"
-  echo "  仓库结构参考：outputs/consensus-hub/ 下的模板"
+  echo "  仓库结构参考：consensus-hub/ 目录下的模板"
   echo "  创建后执行：echo 'consensus_hub_repo: git@github.com:your-org/consensus-hub.git' >> ~/.claude/config.yaml"
 fi
 

@@ -41,7 +41,7 @@ git stash list           # 有非本 session 的 stash？
 git reflog -n 10         # 最近有无来源的 reset / checkout / stash？
 ```
 
-**异常信号**（详见 `knowledge/collaboration.md`）：
+**异常信号**（详见 `.claude/knowledge/collaboration.md`）：
 
 | 检查 | 异常判定 |
 |---|---|
@@ -56,7 +56,7 @@ git reflog -n 10         # 最近有无来源的 reset / checkout / stash？
   · 信号：{具体是哪一条命中}
   · 内容：{陌生 stash / reflog 条目 / 文件列表}
 
-1. Y，启动独立 worktree（推荐，见 knowledge/collaboration.md ④ 档）
+1. Y，启动独立 worktree（推荐，见 .claude/knowledge/collaboration.md ④ 档）
 2. 已知情，继续（另一 agent 的工作已确认归属）
 3. 暂停，我自己先查清（退出 /run-tasks）
 ```

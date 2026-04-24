@@ -12,7 +12,7 @@
 
 **问题 1：AI 写的代码风格五花八门**
 不同开发者让 AI 写的代码风格都不一样，合到一起就是缝合怪。
-→ 本方案用统一的规则文件（CLAUDE.md + knowledge/）约束所有 AI 产出。
+→ 本方案用统一的规则文件（CLAUDE.md + `.claude/knowledge/`）约束所有 AI 产出。
 
 **问题 2：每次都要重复解释业务背景**
 每开一个新对话都得从头告诉 AI 业务是什么、接口怎么定、数据结构是啥。
@@ -132,14 +132,14 @@ Claude 会话之间没记忆。
 cd ~/workspace/your-project
 
 # 运行安装脚本
-bash ~/Downloads/outputs/setup.sh
+bash ~/Downloads/harness-workflow/setup.sh
 ```
 
 脚本会依次问你：
 
 **问题 1**：`consensus-hub 仓库地址`
 - 填 GitHub 仓库 SSH 地址，比如 `git@github.com:your-org/consensus-hub.git`
-- 如果还没建，可以先留空，之后用 `outputs/consensus-hub/` 的模板建好再补到 `~/.claude/config.yaml`
+- 如果还没建，可以先留空，之后用 `harness-workflow/consensus-hub/` 的模板建好再补到 `~/.claude/config.yaml`
 
 **问题 2**：`ai-workflow 规则中心仓库路径`
 - 第一次用，输入 `create`
@@ -378,7 +378,7 @@ bash upgrade-all.sh --only my-project    # 只升级指定项目
 
 **其他开发者**：
 - clone ai-workflow 到本地
-- 在自己的项目仓库 pull 最新的 `.claude/`、`knowledge/`、`CLAUDE.md`（因为这些是第一个人安装时就 commit 了）
+- 在自己的项目仓库 pull 最新的 `.claude/`（含 `commands/` 和 `knowledge/`）、`CLAUDE.md`、`HARNESS_PHILOSOPHY.md`（因为这些是第一个人安装时就 commit 了）
 - 配置自己的环境变量
 - 跑一次 `bash path/to/harness-workflow/setup.sh`（或 `upgrade.sh`）让本地全局命令 + 项目注册表到位
 
@@ -388,7 +388,7 @@ bash upgrade-all.sh --only my-project    # 只升级指定项目
 
 ### 文件怎么分享？
 - ✅ `.claude/commands/` — commit 到项目 Git，团队共享
-- ✅ `knowledge/` — commit 到项目 Git，团队共享
+- ✅ `.claude/knowledge/` — commit 到项目 Git，团队共享
 - ✅ `CLAUDE.md` — commit 到项目 Git，团队共享
 - ✅ `.mcp.json` — commit 到项目 Git，团队共享
 - ✅ `docs/feedback/commands/` — commit 到项目 Git（/command-feedback 产出，供 --collect 聚合）
@@ -431,7 +431,7 @@ claude --debug
 - **看流程图**：`harness-workflow.jsx` 渲染出来，里面每一步都有详细说明
 - **读 CLAUDE.md**：这是 Claude 的"工作手册"，改它就能调整 AI 行为
 - **读命令文件**：`.claude/commands/*.md`，每个命令的逻辑都在里面，想改就改
-- **建立 knowledge 积累**：让团队把踩过的坑、约定的模式都往 `knowledge/` 里加
+- **建立 knowledge 积累**：让团队把踩过的坑、约定的模式都往 `.claude/knowledge/` 里加
 - **定期看 metrics**：`/metrics --days 30` 看 harness 是不是真的在进步，用数字而不是感觉
 
 ---

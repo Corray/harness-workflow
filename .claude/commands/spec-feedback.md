@@ -62,7 +62,7 @@
 > 反馈已生成。建议团队讨论后决定：
 > - 更新设计 → 由设计负责人修改 docs/design/
 > - 升级到共识更新 → 去 ai-workflow 仓库执行 /update-consensus
-> - 标为已知问题 → 在 knowledge/ 中记录
+> - 标为已知问题 → 在 .claude/knowledge/ 中记录
 >
 > 在决策明确前，当前实现暂停或使用临时方案。
 ```

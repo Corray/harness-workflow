@@ -14,21 +14,21 @@
 
 **role = backend**：
 ```
-knowledge/backend/architecture.md
-knowledge/backend/api-conventions.md
-knowledge/backend/database-patterns.md
-knowledge/backend/framework-specifics.md
-knowledge/backend/common-pitfalls.md
-knowledge/red-lines.md
+.claude/knowledge/backend/architecture.md
+.claude/knowledge/backend/api-conventions.md
+.claude/knowledge/backend/database-patterns.md
+.claude/knowledge/backend/framework-specifics.md
+.claude/knowledge/backend/common-pitfalls.md
+.claude/knowledge/red-lines.md
 ```
 
 **role = frontend**：
 ```
-knowledge/frontend/architecture.md
-knowledge/frontend/component-library.md
-knowledge/frontend/api-integration.md
-knowledge/frontend/common-pitfalls.md
-knowledge/red-lines.md
+.claude/knowledge/frontend/architecture.md
+.claude/knowledge/frontend/component-library.md
+.claude/knowledge/frontend/api-integration.md
+.claude/knowledge/frontend/common-pitfalls.md
+.claude/knowledge/red-lines.md
 ```
 
 ### 记录 knowledge-hits 事件
@@ -85,7 +85,7 @@ knowledge/red-lines.md
 运行编译命令，确认无错误。
 
 ### 红线扫描
-逐条对照 `knowledge/red-lines.md`：
+逐条对照 `.claude/knowledge/red-lines.md`：
 - [ ] 无魔法值？
 - [ ] 无吞异常？
 - [ ] API 路径与契约一致？
@@ -138,7 +138,7 @@ knowledge/red-lines.md
 - 编码模式最佳实践？
 
 有的话提出建议：
-> 建议更新 knowledge/backend/framework-specifics.md：
+> 建议更新 .claude/knowledge/backend/framework-specifics.md：
 > 新增："{内容}"
 > 原因：{价值}
 >

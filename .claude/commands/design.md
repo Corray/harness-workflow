@@ -13,14 +13,14 @@
 
 **role = backend**：
 ```
-加载：knowledge/backend/* + knowledge/red-lines.md
-跳过：knowledge/frontend/*、knowledge/testing/*
+加载：.claude/knowledge/backend/* + .claude/knowledge/red-lines.md
+跳过：.claude/knowledge/frontend/*、.claude/knowledge/testing/*
 ```
 
 **role = frontend**：
 ```
-加载：knowledge/frontend/* + knowledge/red-lines.md
-跳过：knowledge/backend/*、knowledge/testing/*
+加载：.claude/knowledge/frontend/* + .claude/knowledge/red-lines.md
+跳过：.claude/knowledge/backend/*、.claude/knowledge/testing/*
 ```
 
 ### 2. 读取共识与迭代信息

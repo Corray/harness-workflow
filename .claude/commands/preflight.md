@@ -11,12 +11,12 @@
 运行所有测试（包括本次新增的）。
 
 ### 3. 覆盖率检查
-对照 `knowledge/testing/standards.md` 中的覆盖率要求：
+对照 `.claude/knowledge/testing/standards.md` 中的覆盖率要求：
 - 单元测试覆盖率
 - 分支覆盖率
 
 ### 4. 红线扫描
-对变更文件执行 `knowledge/red-lines.md` 的全量扫描。
+对变更文件执行 `.claude/knowledge/red-lines.md` 的全量扫描。
 
 ### 5. 设计对齐
 对比设计文档，确认没有实现偏差。

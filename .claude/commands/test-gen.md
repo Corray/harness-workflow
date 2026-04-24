@@ -9,8 +9,8 @@
 ## 执行流程
 
 ### 1. 加载上下文
-- `knowledge/testing/standards.md`
-- `knowledge/red-lines.md`
+- `.claude/knowledge/testing/standards.md`
+- `.claude/knowledge/red-lines.md`
 - `docs/consensus/` 中的业务流程图
 - `docs/design/{feature}-*.md`
 - 实际代码

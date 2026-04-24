@@ -10,7 +10,7 @@
 #   - 新文件、新目录：直接添加（已存在则跳过）
 #   - 已有但内容变更的命令文件（impl.md）
 #     → 先备份为 {name}.bak.{timestamp}，然后覆盖为新版
-#   - 完全不动 CLAUDE.md / HARNESS_PHILOSOPHY.md（如存在）/ knowledge/ / project.yaml /
+#   - 完全不动 CLAUDE.md / HARNESS_PHILOSOPHY.md（如存在）/ .claude/knowledge/ / project.yaml /
 #     docs/baseline / docs/design / docs/consensus 等你的真实工作产物
 #   - 不动 ~/.claude/config.yaml 和全局命令（避免影响其他项目）
 #   - 想回滚某个命令：mv {name}.bak.{timestamp} {name}
@@ -133,7 +133,7 @@ copy_if_missing "$TEMPLATES_DIR/HARNESS_PHILOSOPHY.md" "./HARNESS_PHILOSOPHY.md"
 # 已有但我们改过的命令：impl.md → copy_command
 # （harness-workflow 2026-04 前没有 iterate/review 的大改，保留用户版本；
 #   如果你想统一，把它们也加到 copy_command 分支）
-for cmd_file in "$TEMPLATES_DIR/project/.claude/commands/"*.md; do
+for cmd_file in "$TEMPLATES_DIR/.claude/commands/"*.md; do
   name=$(basename "$cmd_file")
   dst=".claude/commands/$name"
   case "$name" in
@@ -254,7 +254,7 @@ if [ ${#NEW_SIDECAR[@]} -gt 0 ]; then
 fi
 
 if [ ${#SKIPPED[@]} -gt 0 ]; then
-  echo -e "保留未动（${#SKIPPED[@]}）：主要是 knowledge/、CLAUDE.md、project.yaml、.mcp.json、docs/consensus/ 等"
+  echo -e "保留未动（${#SKIPPED[@]}）：主要是 .claude/knowledge/、CLAUDE.md、project.yaml、.mcp.json、docs/consensus/ 等"
   echo ""
 fi
 
@@ -264,7 +264,7 @@ ${BLUE}下一步建议：${NC}
   1. 通读新增的 HARNESS_PHILOSOPHY.md 理解 /adversarial-review、/metrics、/run-tasks、/dashboard 的设计意图
   2. 如有 .new 文件，逐个 diff 后合并（主要是 impl.md，会多出"回写 metrics"这一步）；或去掉 --safe 直接覆盖
   3. 可能需要手动更新的内容（本脚本不会自动动）：
-     - CLAUDE.md：参考模板版 project/CLAUDE.md 加上 /adversarial-review、/metrics、/run-tasks、/dashboard 到命令表
+     - CLAUDE.md：参考模板版 CLAUDE.md 加上 /adversarial-review、/metrics、/run-tasks、/dashboard 到命令表
      - 已有 sprint 的 checklist.md 如需配合新流程，建议重新跑一次 /iterate --refresh-checklist 生成 tasks.yaml
   4. 提交：git add -A && git commit -m "harness: upgrade to 2026-04 (adversarial-review + metrics + run-tasks + dashboard + tasks.yaml)"
 

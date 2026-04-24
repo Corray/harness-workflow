@@ -42,12 +42,12 @@
 ### 3. Knowledge 自迭代
 
 回顾本次 session，寻找可沉淀的知识：
-- 今天发现的框架行为 → knowledge/backend/framework-specifics.md？
-- 今天踩的坑 → knowledge/backend/common-pitfalls.md？
-- 今天用的模式 → knowledge/backend/architecture.md？
+- 今天发现的框架行为 → .claude/knowledge/backend/framework-specifics.md？
+- 今天踩的坑 → .claude/knowledge/backend/common-pitfalls.md？
+- 今天用的模式 → .claude/knowledge/backend/architecture.md？
 
 对每个建议：
-> 建议更新 knowledge/backend/sxp-framework.md：
+> 建议更新 .claude/knowledge/backend/sxp-framework.md：
 > 新增："@Order(97) 的执行顺序需要注意..."
 > 原因：本次遇到的问题原因是没有意识到这一点
 >
